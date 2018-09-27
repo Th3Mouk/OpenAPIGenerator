@@ -3,6 +3,7 @@
 namespace Th3Mouk\OpenAPIGenerator\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -15,26 +16,27 @@ final class GenerateCommand extends Command
     {
         $this
             ->setName('generate')
-            ->setDescription('Generate the swagger.json')
+            ->setDescription('Generate the openapi.json')
+            ->addArgument('path', InputArgument::OPTIONAL, 'The path where generate the openapi.json file', '')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->generateJson();
+        $this->generateJson($input);
         echo 'generated'.PHP_EOL;
     }
 
-    private function generateJson()
+    private function generateJson(InputInterface $input)
     {
         $templateFile = (new Finder())
             ->in(getRootPath().PathHelper::ROOT)
             ->files()
-            ->name('swagger.yaml')
+            ->name('openapi.yaml')
         ;
 
         if (empty($templateFile)) {
-            echo 'no swagger.yaml file found'.PHP_EOL;
+            echo 'no openapi.yaml file found'.PHP_EOL;
             return;
         }
 
@@ -58,8 +60,12 @@ final class GenerateCommand extends Command
         $template['definitions'] = (object) $definitions;
         $template['paths'] = (object) $paths;
 
-        if (!$file = fopen(getRootPath().PathHelper::ROOT.'/swagger.json', 'w')) {
-            echo 'error generating json file'.PHP_EOL;
+        $argPath = $input->getArgument('path');
+        $path = '/' !== substr($argPath, 0, 1) ? '/'.$argPath : $argPath ;
+
+        $openapiFilePath = getRootPath().$path.'/openapi.json';
+        if (!$file = fopen($openapiFilePath, 'w')) {
+            echo 'error generating openapi.json file'.PHP_EOL;
             return;
         }
 
