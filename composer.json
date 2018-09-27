@@ -1,0 +1,29 @@
+{
+    "name": "th3mouk/openapi-generator",
+    "description": "PHP library which provide a scaffolding and generate an OpenAPI file",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérémy Marodon",
+            "email": "marodon.jeremy@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/yaml": "^4.1",
+        "symfony/console": "^4.1",
+        "symfony/finder": "^4.1"
+    },
+    "require-dev": {
+      "phpstan/phpstan": "^0.10",
+      "friendsofphp/php-cs-fixer": "^2.12"
+    },
+    "bin": ["bin/openapi"],
+    "autoload": {
+        "psr-4": {
+            "Th3Mouk\\OpenAPIGenerator\\": ""
+        },
+        "files": [
+            "functions.php"
+        ]
+    }
+}
