@@ -5,6 +5,7 @@ namespace Th3Mouk\OpenAPIGenerator\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -18,6 +19,7 @@ final class GenerateCommand extends Command
             ->setName('generate')
             ->setDescription('Generate the openapi.json')
             ->addArgument('path', InputArgument::OPTIONAL, 'The path where generate the openapi.json file', '')
+            ->addOption('pretty-json', 'p', InputOption::VALUE_NONE,'Generate json file in pretty format')
         ;
     }
 
@@ -69,7 +71,12 @@ final class GenerateCommand extends Command
             return;
         }
 
-        fwrite($file, json_encode($template, JSON_UNESCAPED_SLASHES));
+        if ($input->getOption('pretty-json')) {
+            fwrite($file, json_encode($template, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+        } else {
+            fwrite($file, json_encode($template, JSON_UNESCAPED_SLASHES));
+        }
+
         fclose($file);
     }
 
