@@ -1,8 +1,10 @@
 cs:
-	vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v
+	vendor/bin/phpcs
 
-cs_dry_run:
-	vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run
+fix_cs:
+	vendor/bin/phpcbf
 
-analyse:
-	vendor/bin/phpstan analyse -l 7 .
+stan:
+	vendor/bin/phpstan analyse
+
+ci: cs stan
