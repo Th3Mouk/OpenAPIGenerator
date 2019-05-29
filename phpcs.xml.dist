@@ -20,4 +20,6 @@
 
     <!-- Directories to be checked -->
     <file>Command</file>
+    <file>PathHelper.php</file>
+    <file>functions.php</file>
 </ruleset>

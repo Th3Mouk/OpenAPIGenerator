@@ -2,4 +2,4 @@ parameters:
 	excludes_analyse:
 		- %rootDir%/../../../vendor
 	level: 7
-	paths: ['Command']
+	paths: ['Command', 'PathHelper.php', 'functions.php']
