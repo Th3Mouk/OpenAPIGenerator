@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 if (!function_exists('getRootPath')) {
-
     function getRootPath(): string
     {
         $dir = __DIR__;
@@ -13,5 +12,4 @@ if (!function_exists('getRootPath')) {
 
         return $dir;
     }
-
 }

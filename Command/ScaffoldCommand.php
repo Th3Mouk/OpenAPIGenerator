@@ -18,14 +18,13 @@ final class ScaffoldCommand extends Command
             ->setDescription('Scaffold all directories');
     }
 
-    /**
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $basePath = getRootPath();
-        mkdir($basePath . PathHelper::PATHS, 0777, true);
-        mkdir($basePath . PathHelper::DEFINITIONS);
+        $base_path = getRootPath();
+        mkdir($base_path . PathHelper::PATHS, 0777, true);
+        mkdir($base_path . PathHelper::DEFINITIONS);
         echo 'scaffolded' . PHP_EOL;
+
+        return 0;
     }
 }
