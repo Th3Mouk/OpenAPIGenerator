@@ -24,30 +24,28 @@ final class GenerateCommand extends Command
             ->addOption('pretty-json', 'p', InputOption::VALUE_NONE, 'Generate json file in pretty format');
     }
 
-    /**
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->generateJson($input);
         echo 'generated' . PHP_EOL;
+
+        return 0;
     }
 
     private function generateJson(InputInterface $input): void
     {
-        /** @var Finder $templateFile */
-        $templateFile = (new Finder())
+        $template_file = (new Finder())
             ->in(getRootPath() . PathHelper::ROOT)
             ->files()
             ->name('openapi.yaml');
 
-        if (!$templateFile->hasResults()) {
+        if (!$template_file->hasResults()) {
             echo 'no openapi.yaml file found' . PHP_EOL;
 
             return;
         }
 
-        $template = $this->getFirstElementOfFileIterator($templateFile);
+        $template = $this->getFirstElementOfFileIterator($template_file);
 
         $template    = Yaml::parse($template->getContents());
         $definitions = $template['definitions'] ?? [];
@@ -68,16 +66,16 @@ final class GenerateCommand extends Command
         $template['definitions'] = (object) $definitions;
         $template['paths']       = (object) $paths;
 
-        $argPath = $input->getArgument('path');
+        $arg_path = $input->getArgument('path');
 
-        if (!is_string($argPath)) {
+        if (!is_string($arg_path)) {
             throw new \RuntimeException('Path argument must be a string');
         }
 
-        $path = '/' !== substr($argPath, 0, 1) ? '/' . $argPath : $argPath;
+        $path = '/' !== substr($arg_path, 0, 1) ? '/' . $arg_path : $arg_path;
 
-        $openapiFilePath = getRootPath() . $path . '/openapi.json';
-        if (!$file = fopen($openapiFilePath, 'w')) {
+        $openapi_file_path = getRootPath() . $path . '/openapi.json';
+        if (!$file = fopen($openapi_file_path, 'w')) {
             echo 'error generating openapi.json file' . PHP_EOL;
 
             return;
@@ -92,6 +90,9 @@ final class GenerateCommand extends Command
         fclose($file);
     }
 
+    /**
+     * @return \Generator<mixed>
+     */
     private function getContentGenerator(string $path): \Generator
     {
         foreach ((new Finder())->files()->in(getRootPath() . $path)->name('*.yaml') as $file) {
