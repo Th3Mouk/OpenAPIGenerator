@@ -23,7 +23,7 @@ Inside your project you can now run additional commands:
 
  - `vendor/bin/openapi scaffold`
  - `vendor/bin/openapi generate`
- 
+
 ### Scaffold
 
 To prepare your project, run the first command `scaffold`.
@@ -31,7 +31,16 @@ To prepare your project, run the first command `scaffold`.
 It will create new folders.
 ```txt
 specs
-├── definitions
+├── components
+│   ├── schemas
+│   ├── responses
+│   ├── parameters
+│   ├── examples
+│   ├── requestBodies
+│   ├── headers
+│   ├── securitySchemes
+│   ├── links
+│   └── callbacks
 └── paths
 ```
 
@@ -42,7 +51,7 @@ I personnaly use [Swagger OpenAPI specifications](https://swagger.io/specificati
 One example of organization can be :
 ```txt
 specs
-├── definitions
+├── components
 └── paths
     ├── authentication
     │   ├── login.yaml
@@ -58,7 +67,7 @@ The command `vendor/bin/openapi generate` take arguments and options to generate
 
 You can add a path like this `vendor/bin/openapi generate /in-this-folder/sub`
 
-And it exists a `--pretty-json` or `-p` option to obtain a human readable file. 
+And it exists a `--pretty-json` or `-p` option to obtain a human readable file.
 
 ## Please
 

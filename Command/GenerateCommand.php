@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Th3Mouk\OpenAPIGenerator\PathHelper;
+use Traversable;
 
 final class GenerateCommand extends Command
 {
@@ -47,24 +48,27 @@ final class GenerateCommand extends Command
 
         $template = $this->getFirstElementOfFileIterator($template_file);
 
-        $template    = Yaml::parse($template->getContents());
-        $definitions = $template['definitions'] ?? [];
-        $paths       = $template['paths'] ?? [];
+        $template   = Yaml::parse($template->getContents());
+        $components = $template['components'] ?? [];
 
-        foreach ($this->getContentGenerator(PathHelper::DEFINITIONS) as $definition) {
-            $definitions[] = $definition;
-        }
+        $node_compactor = static fn (Traversable $node_iterator) => array_reduce(
+            iterator_to_array($node_iterator),
+            static fn ($carry, $item) => array_merge($carry, $item),
+            [],
+        );
 
-        foreach ($this->getContentGenerator(PathHelper::PATHS) as $path) {
-            if (null === $path) {
-                continue;
-            }
+        $components['schemas']         = (object) $node_compactor($this->getContentGenerator(PathHelper::SCHEMAS));
+        $components['responses']       = (object) $node_compactor($this->getContentGenerator(PathHelper::RESPONSES));
+        $components['parameters']      = (object) $node_compactor($this->getContentGenerator(PathHelper::PARAMETERS));
+        $components['examples']        = (object) $node_compactor($this->getContentGenerator(PathHelper::EXAMPLES));
+        $components['requestBodies']   = (object) $node_compactor($this->getContentGenerator(PathHelper::REQUEST_BODIES));
+        $components['headers']         = (object) $node_compactor($this->getContentGenerator(PathHelper::HEADERS));
+        $components['securitySchemes'] = (object) $node_compactor($this->getContentGenerator(PathHelper::SECURITY_SCHEMES));
+        $components['links']           = (object) $node_compactor($this->getContentGenerator(PathHelper::LINKS));
+        $components['callbacks']       = (object) $node_compactor($this->getContentGenerator(PathHelper::CALLBACKS));
 
-            $paths[key($path)] = $path[key($path)];
-        }
-
-        $template['definitions'] = (object) $definitions;
-        $template['paths']       = (object) $paths;
+        $template['paths']      = (object) $node_compactor($this->getContentGenerator(PathHelper::PATHS));
+        $template['components'] = (object) $components;
 
         $arg_path = $input->getArgument('path');
 
@@ -83,10 +87,12 @@ final class GenerateCommand extends Command
 
         if ($input->getOption('pretty-json')) {
             fwrite($file, \json_encode($template, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-        } else {
-            fwrite($file, \json_encode($template, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+            fclose($file);
+
+            return;
         }
 
+        fwrite($file, \json_encode($template, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
         fclose($file);
     }
 
